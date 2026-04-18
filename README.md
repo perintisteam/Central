@@ -30,8 +30,10 @@ right `create-*` under the hood and prints next steps for you.
 ## Installation
 
 ```bash
-npm install -g central
+npm install -g @axionteams/central
 ```
+
+The global CLI command is still **`central`** (same as before).
 
 Requires **Node.js >= 18**.
 
@@ -170,7 +172,7 @@ central add ./my-framework.json
 ### Option D — Programmatic API
 
 ```ts
-import { registerFramework } from "central";
+import { registerFramework } from "@axionteams/central";
 
 registerFramework({
   id: "myfw",

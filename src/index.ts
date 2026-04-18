@@ -2,7 +2,7 @@
  * Programmatic entry point for `central` as a library.
  *
  * Example:
- *   import { registerFramework, loadRegistry } from "central";
+ *   import { registerFramework, loadRegistry } from "@axionteams/central";
  *
  *   registerFramework({
  *     id: "myfw",
@@ -41,4 +41,4 @@ export {
 
 export { detectPackageManager } from "./utils/detect-pm.js";
 
-export { CENTRAL_VERSION } from "./version.js";
+export { CENTRAL_NPM_PACKAGE, CENTRAL_VERSION } from "./version.js";

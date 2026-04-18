@@ -8,7 +8,7 @@ import { createSearchCommand } from "./commands/search.js";
 import { createRegistryCommand } from "./commands/registry.js";
 import { createUpdateCommand } from "./commands/update.js";
 import { runInteractive } from "./commands/interactive.js";
-import { CENTRAL_VERSION } from "./version.js";
+import { CENTRAL_NPM_PACKAGE, CENTRAL_VERSION } from "./version.js";
 
 async function main(): Promise<void> {
   const program = new Command();
@@ -28,7 +28,12 @@ async function main(): Promise<void> {
   program.addCommand(createSearchCommand());
   program.addCommand(createAddCommand());
   program.addCommand(createRegistryCommand());
-  program.addCommand(createUpdateCommand({ currentVersion: CENTRAL_VERSION }));
+  program.addCommand(
+    createUpdateCommand({
+      currentVersion: CENTRAL_VERSION,
+      packageName: CENTRAL_NPM_PACKAGE,
+    })
+  );
 
   program.action(async () => {
     await runInteractive(CENTRAL_VERSION);

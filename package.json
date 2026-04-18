@@ -1,6 +1,9 @@
 {
-  "name": "central",
-  "version": "0.1.0",
+  "name": "@axionteams/central",
+  "version": "0.1.4",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "One command to install any JS/TS framework",
   "type": "module",
   "bin": {
