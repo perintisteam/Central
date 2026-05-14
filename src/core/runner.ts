@@ -41,6 +41,41 @@ function normaliseCommand(command: string): string {
   return command.replace(/\s{2,}/g, " ").trim();
 }
 
+const TRUSTED_SHELL_FRAMEWORK_IDS = new Set(["nestjs"]);
+
+const UNSAFE_SHELL_PATTERNS: Array<{ pattern: RegExp; label: string }> = [
+  { pattern: /&&|\|\|/, label: "command chaining (&& or ||)" },
+  { pattern: /;/, label: "command separator (;)" },
+  { pattern: /\|/, label: "pipe operator (|)" },
+  { pattern: /[`]/, label: "command substitution with backticks" },
+  { pattern: /\$\(/, label: "command substitution with $(" },
+  { pattern: /[<>]/, label: "shell redirection (< or >)" },
+  { pattern: /(^|\s)&(\s|$)/, label: "background execution (&)" },
+  { pattern: /\r|\n/, label: "multiple shell lines" },
+];
+
+/**
+ * Prevent custom framework definitions from hiding extra shell behavior inside
+ * install commands. CENTRAL still uses a shell for compatibility with creator
+ * CLIs, so blocking these operators protects the most common injection paths.
+ */
+function assertSafeInstallCommand(framework: Framework, command: string): void {
+  if (framework.install.type !== "custom") return;
+  if (command.startsWith("central:scaffold-express-ts")) return;
+  if (TRUSTED_SHELL_FRAMEWORK_IDS.has(framework.id)) return;
+
+  const match = UNSAFE_SHELL_PATTERNS.find(({ pattern }) => pattern.test(command));
+  if (!match) return;
+
+  throw new Error(
+    [
+      `Refusing to run custom install command for "${framework.id}" because it contains ${match.label}.`,
+      "Use a single trusted scaffold command, or split the setup into documented next steps.",
+      `Command: ${command}`,
+    ].join("\n")
+  );
+}
+
 /**
  * Execute a framework's install command.
  * Interactive creators (create-next-app, create-astro, etc.) need a real TTY,
@@ -62,6 +97,8 @@ export async function runFrameworkInstall(
       `Install command for "${framework.id}" resolved to an empty string — check its prompt placeholders.`
     );
   }
+
+  assertSafeInstallCommand(framework, command);
 
   if (framework.install.type === "custom" && command.startsWith("central:scaffold-express-ts")) {
     const projectName = String(answers["projectName"] ?? "").trim();
@@ -204,7 +241,7 @@ app.listen(port, () => {
     const gitignore = "node_modules\ndist\n.env\n";
     const readme = `# ${projectName}
 
-Scaffolded with [CENTRAL](https://www.npmjs.com/package/central).
+Scaffolded with [CENTRAL](https://www.npmjs.com/package/@axionteams/central).
 
 ## Quickstart
 

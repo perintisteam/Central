@@ -186,6 +186,29 @@ registerFramework({
 
 ---
 
+## Security notes
+
+CENTRAL runs scaffold commands on your machine, so custom framework definitions should be treated like executable code.
+
+To reduce command-injection risk, CENTRAL now blocks common shell-control operators inside custom registry commands before execution, including:
+
+- `&&`, `||`, and `;`
+- pipes with `|`
+- redirects with `<` or `>`
+- command substitution using backticks or `$(`
+- newline-separated commands
+- standalone background execution with `&`
+
+Built-in internal scaffolds such as `central:scaffold-express-ts` are handled by CENTRAL itself. Only install custom framework definitions from sources you trust, and prefer simple single-command scaffolds such as:
+
+```bash
+npx create-example@latest {{projectName}}
+```
+
+For more details, see `SECURITY.md`.
+
+---
+
 ## Framework definition schema
 
 Every framework is validated with [zod](https://zod.dev/) at load time:
@@ -224,8 +247,8 @@ Placeholder tokens of the form `{{id}}` inside `install.command` and
 ## Development
 
 ```bash
-git clone https://github.com/your-org/central.git
-cd central
+git clone https://github.com/perintisteam/Central.git
+cd Central
 npm install
 npm run dev       # tsup in watch mode
 npm run build     # build to ./dist
